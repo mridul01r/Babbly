@@ -1,7 +1,34 @@
-const XSvg = (props) => (
-	<svg aria-hidden='true' viewBox='0 0 24 24' {...props}>
-		<path d='M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' />
-	</svg>
-);
-export default XSvg;
+import React from 'react';
 
+const BabblySvg = (props) => (
+  <svg
+    aria-hidden="true"
+    viewBox="0 0 200 60"
+    xmlns="http://www.w3.org/2000/svg"
+    className={`w-32 h-12 ${props.className || ''}`}
+    {...props}
+  >
+    <defs>
+      {/* Text gradient that works well with dark blue backgrounds */}
+      <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stopColor="#5CFFFA" />
+        <stop offset="100%" stopColor="#38C0FF" />
+      </linearGradient>
+    </defs>
+    
+    {/* Main text with gradient and FF Avance font family */}
+    <text
+      x="100"
+      y="38"
+      fontFamily="'FF Avance', sans-serif"
+      fontSize="36"
+      fontWeight="bold"
+      textAnchor="middle"
+      fill="url(#textGradient)"
+    >
+      BABBLY
+    </text>
+  </svg>
+);
+
+export default BabblySvg;

@@ -11,8 +11,10 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
 
 const ProfilePage = () => {
+	// useQuery({queryKey:["authUser"]})
 	const [coverImg, setCoverImg] = useState(null);
 	const [profileImg, setProfileImg] = useState(null);
 	const [feedType, setFeedType] = useState("posts");
@@ -25,12 +27,12 @@ const ProfilePage = () => {
 
 	const user = {
 		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
+		fullName: "Mridul Rakhecha",
+		username: "mridulr",
 		profileImg: "/avatars/boy2.png",
 		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
+		bio: "Anime enthusiast and developer. Currently watching One Piece, Jujutsu Kaisen, and Demon Slayer. Always looking for new anime recommendations!",
+		link: "https://youtube.com/@mridulcodes",
 		following: ["1", "2", "3"],
 		followers: ["1", "2", "3"],
 	};
@@ -141,12 +143,12 @@ const ProfilePage = () => {
 											<>
 												<FaLink className='w-3 h-3 text-slate-500' />
 												<a
-													href='https://youtube.com/@asaprogrammer_'
+													href={user?.link}
 													target='_blank'
 													rel='noreferrer'
 													className='text-sm text-blue-500 hover:underline'
 												>
-													youtube.com/@asaprogrammer_
+													youtube.com/@mridulcodes
 												</a>
 											</>
 										</div>
