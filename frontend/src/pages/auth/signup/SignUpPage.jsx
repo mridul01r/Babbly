@@ -53,104 +53,151 @@ const SignUpPage = () => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto flex h-screen bg-gray-900">
-      <div className="flex-1 hidden lg:flex items-center justify-center bg-blue-600">
-        <XSvg className="lg:w-2/3 fill-white opacity-90 transform hover:scale-105 transition-transform duration-300" />
-      </div>
-      <div className="flex-1 flex flex-col justify-center items-center px-6 md:px-10">
-        <div className="w-full max-w-md">
-          <form className="flex gap-5 flex-col mb-8" onSubmit={handleSubmit}>
-            <div className="text-center mb-2">
-              <XSvg className="w-16 h-16 mx-auto lg:hidden fill-white mb-4" />
-              <h1 className="text-4xl font-extrabold text-white mb-2">Join today.</h1>
-              <p className="text-gray-300">Create your account in just a few steps</p>
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
+      {/* Left side with background and logo */}
+      <div className="bg-gradient-to-br from-blue-700 to-blue-900 w-full md:w-1/2 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+        {/* Wave pattern overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+          <div className="absolute top-2/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+        </div>
+        
+        <div className="relative z-10 max-w-md w-full text-center">
+          {/* Logo */}
+          <div className="mb-6 flex justify-center">
+            <div className="bg-blue-800 border-2 border-blue-400 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">B</span>
             </div>
-            
-            <label className="input input-bordered rounded-lg flex items-center gap-2 bg-gray-800 border-gray-700 hover:border-blue-500 transition-colors duration-200 focus-within:border-blue-500 px-4 py-3">
-              <MdOutlineMail className="text-gray-400" />
-              <input
-                type="email"
-                className="grow bg-transparent focus:outline-none text-white"
-                placeholder="Email"
-                name="email"
-                onChange={handleInputChange}
-                value={formData.email}
-                required
-              />
-            </label>
-            
-            <div className="flex gap-4 flex-wrap">
-              <label className="input input-bordered rounded-lg flex items-center gap-2 flex-1 bg-gray-800 border-gray-700 hover:border-blue-500 transition-colors duration-200 focus-within:border-blue-500 px-4 py-3">
-                <FaUser className="text-gray-400" />
+          </div>
+          
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Join Babbly Today
+          </h1>
+          <p className="text-blue-100 text-lg opacity-90">
+            Share your thoughts with the world
+          </p>
+        </div>
+      </div>
+
+      {/* Right side with signup form */}
+      <div className="w-full md:w-1/2 flex justify-center items-center p-6 bg-gray-900">
+        <div className="max-w-md w-full py-6 px-6 rounded-lg">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold text-white">Create Account</h2>
+            <p className="mt-2 text-gray-400">Sign up in just a few steps</p>
+          </div>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                Email
+              </label>
+              <div className="relative">
                 <input
-                  type="text"
-                  className="grow bg-transparent focus:outline-none text-white"
-                  placeholder="Username"
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your email"
+                  onChange={handleInputChange}
+                  value={formData.email}
+                />
+              </div>
+            </div>
+
+            {/* Username and Full Name in two columns */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex-1">
+                <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                  Username
+                </label>
+                <input
+                  id="username"
                   name="username"
+                  type="text"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Choose a username"
                   onChange={handleInputChange}
                   value={formData.username}
-                  required
                 />
-              </label>
-              <label className="input input-bordered rounded-lg flex items-center gap-2 flex-1 bg-gray-800 border-gray-700 hover:border-blue-500 transition-colors duration-200 focus-within:border-blue-500 px-4 py-3">
-                <MdDriveFileRenameOutline className="text-gray-400" />
+              </div>
+              
+              <div className="flex-1">
+                <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
+                  Full Name
+                </label>
                 <input
-                  type="text"
-                  className="grow bg-transparent focus:outline-none text-white"
-                  placeholder="Full Name"
+                  id="fullName"
                   name="fullName"
+                  type="text"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your full name"
                   onChange={handleInputChange}
                   value={formData.fullName}
-                  required
                 />
-              </label>
+              </div>
             </div>
-            
-            <label className="input input-bordered rounded-lg flex items-center gap-2 bg-gray-800 border-gray-700 hover:border-blue-500 transition-colors duration-200 focus-within:border-blue-500 px-4 py-3">
-              <MdPassword className="text-gray-400" />
-              <input
-                type="password"
-                className="grow bg-transparent focus:outline-none text-white"
-                placeholder="Password"
-                name="password"
-                onChange={handleInputChange}
-                value={formData.password}
-                required
-              />
-            </label>
-            
+
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Create a password"
+                  onChange={handleInputChange}
+                  value={formData.password}
+                />
+              </div>
+            </div>
+
+            {/* Error Message */}
             {isError && (
-              <div className="bg-red-900 bg-opacity-30 text-red-200 p-3 rounded-lg flex items-center">
-                <span className="text-red-500 mr-2">●</span>
+              <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded">
                 {error.message}
               </div>
             )}
-            
-            <button className="btn rounded-full btn-primary text-white font-bold py-3 mt-2 bg-blue-600 hover:bg-blue-700 transition-colors duration-200">
-              {isLoading ? (
-                <span className="flex items-center gap-2">
-                  <span className="loading loading-spinner loading-sm"></span>
-                  Creating account...
-                </span>
-              ) : (
-                "Sign up"
-              )}
-            </button>
+
+            {/* Sign Up Button */}
+            <div className="mt-6">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+              >
+                {isLoading ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating account...
+                  </span>
+                ) : (
+                  "SIGN UP"
+                )}
+              </button>
+            </div>
           </form>
-          
-          <div className="flex flex-col gap-4 text-center">
-            <div className="divider text-gray-500 before:bg-gray-700 after:bg-gray-700">or</div>
-            <p className="text-gray-300">
+
+          {/* Sign In Link */}
+          <div className="text-center mt-6">
+            <p className="text-gray-400">
               Already have an account?{" "}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 transition-colors duration-200">
-                Sign in
+              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">
+                Log In
               </Link>
             </p>
-            <Link to="/login" className="w-full">
-              <button className="btn rounded-full btn-outline text-white border-gray-600 hover:bg-blue-600 hover:border-blue-600 transition-all duration-200 w-full">
-                Sign in
-              </button>
-            </Link>
           </div>
         </div>
       </div>
