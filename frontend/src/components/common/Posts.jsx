@@ -3,41 +3,30 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const Posts = ({ feedType }) => {
-	const getPostEndpoint = (feedType) => {
-		switch (feedType) {
-			case "forYou":
-				return "/api/posts/all";
-			case "following":
-				return "/api/posts/following";
-			default:
-				return "/api/posts/all";
-		}
+const Posts = ({ feedType, username, userId }) => {
+	const getPostEndpoint = () => {
+		if (feedType === "forYou") return "/api/posts/all";
+		if (feedType === "following") return "/api/posts/following";
+		if (feedType === "posts") return `/api/posts/user/${username}`;
+		if (feedType === "likes") return `/api/posts/likes/${userId}`;
+		return "/api/posts/all";
 	};
 
-	const POST_ENDPOINT = getPostEndpoint(feedType); // Added feedType parameter
+	const POST_ENDPOINT = getPostEndpoint();
 
 	const { data: posts, isLoading, refetch, isRefetching } = useQuery({
-		queryKey: ["posts", feedType], // Use feedType instead of endpoint in queryKey
+		queryKey: ["posts", feedType, username, userId],
 		queryFn: async () => {
-			try {
-				const res = await fetch(POST_ENDPOINT);
-				const data = await res.json();
-
-				if (!res.ok) {
-					throw new Error(data.error || "Something went wrong");
-				}
-
-				return data;
-			} catch (error) {
-				throw new Error(error.message);
-			}
-		}
+			const res = await fetch(POST_ENDPOINT);
+			const data = await res.json();
+			if (!res.ok) throw new Error(data.error || "Something went wrong");
+			return data;
+		},
 	});
 
 	useEffect(() => {
 		refetch();
-	}, [feedType, refetch]);
+	}, [feedType, refetch, username, userId]);
 
 	return (
 		<>
@@ -48,9 +37,11 @@ const Posts = ({ feedType }) => {
 					<PostSkeleton />
 				</div>
 			)}
+
 			{!isLoading && !isRefetching && posts?.length === 0 && (
 				<p className='text-center my-4'>No posts in this tab. Switch 👻</p>
 			)}
+
 			{!isLoading && !isRefetching && posts && (
 				<div>
 					{posts.map((post) => (
@@ -61,4 +52,5 @@ const Posts = ({ feedType }) => {
 		</>
 	);
 };
+
 export default Posts;
