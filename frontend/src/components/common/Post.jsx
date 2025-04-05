@@ -8,16 +8,21 @@ import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "./LoadingSpinner";
+import { formatPostDate } from "../../utils/date";
 
 const Post = ({ post }) => {
 	const [comment, setComment] = useState("");
 	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 	const queryClient = useQueryClient();
+	const postOwner = post.user;
+	const isLiked = post.likes.includes(authUser?._id);
+	const isMyPost = authUser?._id === post.user._id;
+	const formattedDate = formatPostDate(post.createdAt);
 
-	const { mutate: deletePost, isPending } = useMutation({
+	const { mutate: deletePost, isPending:isDeleting } = useMutation({
 		mutationFn: async () => {
 			try {
-				const res = await fetch(`/api/posts/${post._id}`, { // Changed post.id to post._id
+				const res = await fetch(`/api/posts/${post._id}`, {
 					method: "DELETE",
 				});
 				const data = await res.json();
@@ -31,19 +36,74 @@ const Post = ({ post }) => {
 			}
 		},
 		onSuccess: () => {
-			toast.success("Post deleted successfully"); // Fixed toast notification
+			toast.success("Post deleted successfully");
 			queryClient.invalidateQueries({queryKey: ["posts"]});
 		},
-		onError: (error) => { // Added error handling
+		onError: (error) => {
 			toast.error(error.message);
 		}
 	});
 
-	const postOwner = post.user;
-	const isLiked = post.likes.includes(authUser?._id); // Fixed isLiked logic
-	const isMyPost = authUser?._id === post.user._id; // Added optional chaining
-	const formattedDate = new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Improved date formatting
-	const [isCommenting, setIsCommenting] = useState(false); // Added comment state
+	const {mutate: likePost, isPending: isLiking} = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch(`/api/posts/like/${post._id}`,{
+					method: "POST",
+				});
+				const data = await res.json();
+				if(!res.ok){
+					throw new Error(data.error || "Something went wrong");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(error.message);
+			}
+		},
+		onSuccess:(updatedLikes) => {
+			queryClient.setQueryData(["posts"], (oldData) => {
+				if (!oldData) return oldData;
+				return oldData.map(p => {
+					if(p._id === post._id){
+						return {...p, likes: updatedLikes}
+					}
+					return p;
+				});
+			});
+		},
+		onError:(error) => {
+			toast.error(error.message);
+		}
+	});
+
+	const { mutate: commentPost, isPending: isCommenting } = useMutation({
+		mutationFn: async () => {
+			try {
+				const res = await fetch(`/api/posts/comment/${post._id}`, {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ text: comment }),
+				});
+				const data = await res.json();
+
+				if (!res.ok) {
+					throw new Error(data.error || "Something went wrong");
+				}
+				return data;
+			} catch (error) {
+				throw new Error(error.message);
+			}
+		},
+		onSuccess: () => {
+			toast.success("Comment posted successfully");
+			setComment("");
+			queryClient.invalidateQueries({queryKey: ["posts"]});
+		},
+		onError: (error) => {
+			toast.error(error.message);
+		}
+	});
 
 	const handleDeletePost = () => {
 		// if (window.confirm("Are you sure you want to delete this post?")) {
@@ -54,44 +114,12 @@ const Post = ({ post }) => {
 	const handlePostComment = async (e) => {
 		e.preventDefault();
 		if (!comment.trim()) return;
-		
-		setIsCommenting(true);
-		try {
-			const res = await fetch(`/api/post/comment/${post._id}`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ text: comment }),
-			});
-			const data = await res.json();
-			
-			if (!res.ok) {
-				throw new Error(data.error || "Failed to post comment");
-			}
-			setComment("");
-			toast.success("Comment posted successfully");
-		} catch (error) {
-			toast.error(error.message);
-		} finally {
-			setIsCommenting(false);
-		}
+		commentPost();
 	};
 
 	const handleLikePost = async () => {
-		try {
-			const res = await fetch(`/api/post/like/${post._id}`, {
-				method: "POST",
-			});
-			const data = await res.json();
-			
-			if (!res.ok) {
-				throw new Error(data.error || "Failed to like post");
-			}
-			toast.success(isLiked ? "Post unliked" : "Post liked");
-		} catch (error) {
-			toast.error(error.message);
-		}
+		if(isLiking) return;
+		likePost();
 	};
 
 	return (
@@ -117,8 +145,8 @@ const Post = ({ post }) => {
 						</span>
 						{isMyPost && (
 							<span className='flex justify-end flex-1'>
-								{!isPending && <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />}
-								{isPending && <LoadingSpinner size="sm" />}
+								{!isDeleting && <FaTrash className='cursor-pointer hover:text-red-500' onClick={handleDeletePost} />}
+								{isDeleting && <LoadingSpinner size="sm" />}
 							</span>
 						)}
 					</div>
@@ -192,8 +220,8 @@ const Post = ({ post }) => {
 											disabled={isCommenting}
 										>
 											{isCommenting ? (
-												<span className='loading loading-spinner loading-md'></span>
-											) : (
+												<LoadingSpinner size="md"/>
+											) :(
 												"Post"
 											)}
 										</button>
@@ -209,6 +237,7 @@ const Post = ({ post }) => {
 								<span className='text-sm text-slate-500 group-hover:text-green-500'>0</span>
 							</div>
 							<div className='flex gap-1 items-center group cursor-pointer' onClick={handleLikePost}>
+								{isLiking && <LoadingSpinner size="sm" />}
 								{isLiked ? (
 									<FaRegHeart className='w-4 h-4 cursor-pointer text-pink-500' />
 								) : (
@@ -230,4 +259,3 @@ const Post = ({ post }) => {
 };
 
 export default Post;
- 
