@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import XSvg from "../../../components/svgs/X";
 import { MdOutlineMail } from "react-icons/md";
 import { MdPassword } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -36,7 +34,7 @@ const LoginPage = () => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({queryKey : ["authUser"]});
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 
@@ -50,104 +48,92 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col md:flex-row">
-      {/* Left side with logo (visible on all screens) */}
-      <div className="bg-blue-600 w-full md:w-1/2 flex flex-col justify-center items-center p-8">
-        <div className="max-w-md w-full">
-          <XSvg className="w-32 h-32 mx-auto mb-8 fill-white" />
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white text-center mb-6">
-            Welcome Back
+    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
+      {/* Left side with background and logo */}
+      <div className="bg-gradient-to-br from-blue-700 to-blue-900 w-full md:w-1/2 flex flex-col justify-center items-center p-8 relative overflow-hidden">
+        {/* Wave pattern overlay */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-1/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+          <div className="absolute top-2/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+        </div>
+        
+        <div className="relative z-10 max-w-md w-full text-center">
+          {/* Logo */}
+          <div className="mb-6 flex justify-center">
+            <div className="bg-blue-800 border-2 border-blue-400 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">B</span>
+            </div>
+          </div>
+          
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+            Welcome to Babbly
           </h1>
-          <p className="text-white text-center text-lg opacity-90">
-            Connect with friends and the world around you.
+          <p className="text-blue-100 text-lg opacity-90">
+            Connect with friends and share your world
           </p>
         </div>
       </div>
 
       {/* Right side with login form */}
-      <div className="w-full md:w-1/2 flex justify-center items-center p-8">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white">Log in to your account</h2>
-            <p className="mt-2 text-gray-400">Enter your credentials to continue</p>
+      <div className="w-full md:w-1/2 flex justify-center items-center p-6 bg-gray-900">
+        <div className="max-w-md w-full py-8 px-6 rounded-lg">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white">Welcome</h2>
+            <p className="mt-2 text-gray-400">Log in to your account to continue</p>
           </div>
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="username" className="sr-only">
-                  Username
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MdOutlineMail className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="username"
-                    name="username"
-                    type="text"
-                    required
-                    className="appearance-none relative block w-full px-3 py-3 pl-10 bg-gray-800 border border-gray-700 placeholder-gray-400 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Username or email"
-                    onChange={handleInputChange}
-                    value={formData.username}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="password" className="sr-only">
-                  Password
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MdPassword className="h-5 w-5 text-gray-400" />
-                  </div>
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    className="appearance-none relative block w-full px-3 py-3 pl-10 bg-gray-800 border border-gray-700 placeholder-gray-400 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Password"
-                    onChange={handleInputChange}
-                    value={formData.password}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+          <form className="space-y-5" onSubmit={handleSubmit}>
+            {/* Email/Username Field */}
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+                Email or Username
+              </label>
+              <div className="relative">
                 <input
-                  id="remember-me"
-                  name="remember-me"
-                  type="checkbox"
-                  className="h-4 w-4 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                  id="username"
+                  name="username"
+                  type="text"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your email or username"
+                  onChange={handleInputChange}
+                  value={formData.username}
                 />
-                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-400">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <a href="#" className="text-blue-500 hover:text-blue-400">
-                  Forgot your password?
-                </a>
               </div>
             </div>
 
+            {/* Password Field */}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Enter your password"
+                  onChange={handleInputChange}
+                  value={formData.password}
+                />
+              </div>
+            </div>
+
+            {/* Error Message */}
             {isError && (
               <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded">
                 {error.message}
               </div>
             )}
 
-            <div>
+            {/* Sign In Button */}
+            <div className="mt-8">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
               >
                 {isLoading ? (
                   <span className="flex items-center">
@@ -158,17 +144,18 @@ const LoginPage = () => {
                     Loading...
                   </span>
                 ) : (
-                  "Sign in"
+                  "LOG IN"
                 )}
               </button>
             </div>
           </form>
 
+          {/* Sign Up Link */}
           <div className="text-center mt-6">
             <p className="text-gray-400">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-500 hover:text-blue-400 font-medium">
-                Sign up
+              <Link to="/signup" className="text-blue-400 hover:text-blue-300 font-medium">
+                Sign Up
               </Link>
             </p>
           </div>
