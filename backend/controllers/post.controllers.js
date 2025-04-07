@@ -42,7 +42,10 @@ export const deletePost = async (req, res) => {
 			return res.status(404).json({ error: "Post not found" });
 		}
 
-		if (post.user.toString() !== req.user._id.toString()) {
+		const isOwner = post.user.toString() === req.user._id.toString();
+		const isAdmin = req.user.isAdmin;
+
+		if (!isOwner && !isAdmin) {
 			return res.status(401).json({ error: "You are not authorized to delete this post" });
 		}
 
@@ -101,14 +104,12 @@ export const likeUnlikePost = async (req, res) => {
 		const userLikedPost = post.likes.includes(userId);
 
 		if (userLikedPost) {
-			// Unlike post
 			await Post.updateOne({ _id: postId }, { $pull: { likes: userId } });
 			await User.updateOne({ _id: userId }, { $pull: { likedPosts: postId } });
 
 			const updatedLikes = post.likes.filter((id) => id.toString() !== userId.toString());
 			res.status(200).json(updatedLikes);
 		} else {
-			// Like post
 			post.likes.push(userId);
 			await User.updateOne({ _id: userId }, { $push: { likedPosts: postId } });
 			await post.save();
@@ -226,4 +227,4 @@ export const getUserPosts = async (req, res) => {
 		console.log("Error in getUserPosts controller: ", error);
 		res.status(500).json({ error: "Internal server error" });
 	}
-}; 
+};

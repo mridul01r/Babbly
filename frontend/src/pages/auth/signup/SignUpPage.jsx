@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import XSvg from "../../../components/svgs/X";
-import { MdOutlineMail } from "react-icons/md";
-import { FaUser } from "react-icons/fa";
-import { MdPassword } from "react-icons/md";
-import { MdDriveFileRenameOutline } from "react-icons/md";
-import { useMutation } from "@tanstack/react-query";
+import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa";
+import { MdOutlineMail, MdPassword, MdDriveFileRenameOutline } from "react-icons/md";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import XSvg from "../../../components/svgs/X";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -15,31 +13,26 @@ const SignUpPage = () => {
     fullName: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [activeStep, setActiveStep] = useState(1);
+  const queryClient = useQueryClient();
 
-  const { mutate, isError, isLoading, error } = useMutation({
+  const { mutate, isError, isPending, error } = useMutation({
     mutationFn: async ({ email, username, fullName, password }) => {
-      try {
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, username, fullName, password }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.error || "Failed to create account");
-
-        console.log(data);
-        return data;
-      } catch (error) {
-        console.error(error);
-        throw error;
-      }
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, username, fullName, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to create account");
+      return data;
     },
     onSuccess: () => {
       toast.success("Account created successfully");
+      queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
   });
 
@@ -52,151 +45,160 @@ const SignUpPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const stepLabels = [
+    "Sign up your account",
+    "Set up your workspace",
+    "Set up your profile",
+  ];
+
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
-      {/* Left side with background and logo */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 w-full md:w-1/2 flex flex-col justify-center items-center p-8 relative overflow-hidden">
-        {/* Wave pattern overlay */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
-          <div className="absolute top-2/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+    <div className="flex h-screen bg-black">
+      {/* Left side */}
+      <div className="w-1/2 hidden lg:flex flex-col justify-center items-center bg-gradient-to-b from-purple-800 via-purple-700 to-purple-900 relative p-8">
+        <div className="mb-6">
+          <XSvg className="w-16 h-16 fill-white" />
         </div>
-        
-        <div className="relative z-10 max-w-md w-full text-center">
-          {/* Logo */}
-          <div className="mb-6 flex justify-center">
-            <div className="bg-blue-800 border-2 border-blue-400 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-2xl">B</span>
+        <h1 className="text-4xl font-bold text-white mb-2">Get Started with Us</h1>
+        <p className="text-white text-center mb-12">Complete these easy steps to register your account.</p>
+
+        <div className="w-full max-w-md">
+          {[1, 2, 3].map((step) => (
+            <div
+              key={step}
+              className={`flex items-center p-4 mb-4 rounded-lg transition-all duration-300 cursor-default ${
+                activeStep === step
+                  ? "bg-black bg-opacity-25"
+                  : "bg-black bg-opacity-25"
+              }`}
+            >
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center mr-4 transition-colors ${
+                  activeStep === step
+                    ? "bg-black bg-opacity-25"
+                    : "bg-black bg-opacity-25"
+                }`}
+              >
+                <span className="font-bold">{step}</span>
+              </div>
+              <span
+                className={`font-medium transition-colors duration-200 ${
+                  activeStep === step ? "text-white" : "text-gray-300"
+                }`}
+              >
+                {stepLabels[step - 1]}
+              </span>
             </div>
-          </div>
-          
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Join Babbly Today
-          </h1>
-          <p className="text-blue-100 text-lg opacity-90">
-            Share your thoughts with the world
-          </p>
+          ))}
         </div>
       </div>
 
-      {/* Right side with signup form */}
-      <div className="w-full md:w-1/2 flex justify-center items-center p-6 bg-gray-900">
-        <div className="max-w-md w-full py-6 px-6 rounded-lg">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-white">Create Account</h2>
-            <p className="mt-2 text-gray-400">Sign up in just a few steps</p>
+      {/* Right side */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden flex justify-center mb-6">
+            <XSvg className="w-16 h-16 fill-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Sign Up Account</h2>
+          <p className="text-gray-400 mb-6">Enter your personal data to create your account.</p>
+
+          <div className="flex items-center my-4">
+            <div className="flex-grow h-px bg-gray-700"></div>
+            <p className="mx-4 text-gray-400">Or</p>
+            <div className="flex-grow h-px bg-gray-700"></div>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Email Field */}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="flex gap-4">
+              <div className="flex-1">
+                <label className="block text-white mb-2 font-medium">Username</label>
+                <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-purple-500 focus-within:border-purple-500 transition-colors">
+                  <FaUser className="text-gray-400" />
+                  <input
+                    type="text"
+                    name="username"
+                    value={formData.username}
+                    onChange={handleInputChange}
+                    placeholder="Enter username"
+                    required
+                    className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex-1">
+                <label className="block text-white mb-2 font-medium">Full Name</label>
+                <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-purple-500 focus-within:border-purple-500 transition-colors">
+                  <MdDriveFileRenameOutline className="text-gray-400 text-xl" />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    placeholder="Enter full name"
+                    required
+                    className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
+                  />
+                </div>
+              </div>
+            </div>
+
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
-                Email
-              </label>
-              <div className="relative">
+              <label className="block text-white mb-2 font-medium">Email</label>
+              <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-purple-500 focus-within:border-purple-500 transition-colors">
+                <MdOutlineMail className="text-gray-400 text-xl" />
                 <input
-                  id="email"
-                  name="email"
                   type="email"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your email"
-                  onChange={handleInputChange}
+                  name="email"
                   value={formData.email}
+                  onChange={handleInputChange}
+                  placeholder="Enter email address"
+                  required
+                  className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
                 />
               </div>
             </div>
 
-            {/* Username and Full Name in two columns */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="flex-1">
-                <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
-                  Username
-                </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Choose a username"
-                  onChange={handleInputChange}
-                  value={formData.username}
-                />
-              </div>
-              
-              <div className="flex-1">
-                <label htmlFor="fullName" className="block text-sm font-medium text-gray-300 mb-1">
-                  Full Name
-                </label>
-                <input
-                  id="fullName"
-                  name="fullName"
-                  type="text"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your full name"
-                  onChange={handleInputChange}
-                  value={formData.fullName}
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-                Password
-              </label>
-              <div className="relative">
+              <label className="block text-white mb-2 font-medium">Password</label>
+              <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-purple-500 focus-within:border-purple-500 transition-colors relative">
+                <MdPassword className="text-gray-400 text-xl" />
                 <input
-                  id="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
-                  type="password"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Create a password"
-                  onChange={handleInputChange}
                   value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter password"
+                  required
+                  className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+                </button>
               </div>
+              <p className="text-gray-400 text-sm mt-1">Must be at least 8 characters.</p>
             </div>
 
-            {/* Error Message */}
-            {isError && (
-              <div className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded">
-                {error.message}
-              </div>
-            )}
-
-            {/* Sign Up Button */}
-            <div className="mt-6">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-              >
-                {isLoading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Creating account...
-                  </span>
-                ) : (
-                  "SIGN UP"
-                )}
-              </button>
-            </div>
+            <button
+              type="submit"
+              className="w-full btn rounded-lg btn-primary text-white py-4 mt-4 bg-purple-600 hover:bg-purple-700 border-none shadow-lg transition-all"
+              disabled={isPending}
+            >
+              {isPending ? "Creating Account..." : "Sign Up"}
+            </button>
+            {isError && <p className="text-red-500 text-center font-medium">{error.message}</p>}
           </form>
 
-          {/* Sign In Link */}
           <div className="text-center mt-6">
             <p className="text-gray-400">
-              Already have an account?{" "}
-              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-medium">
-                Log In
-              </Link>
+              Already have an account? <Link to="/login" className="text-purple-400 hover:text-purple-300">Log in</Link>
             </p>
           </div>
         </div>

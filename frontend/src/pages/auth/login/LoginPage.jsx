@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { MdOutlineMail } from "react-icons/md";
-import { MdPassword } from "react-icons/md";
+import { MdOutlineMail, MdPassword } from "react-icons/md";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import XSvg from "../../../components/svgs/X";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -13,25 +13,21 @@ const LoginPage = () => {
   const queryClient = useQueryClient();
   const { mutate: loginMutation, isError, isLoading, error } = useMutation({
     mutationFn: async ({ username, password }) => {
-      try {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ username, password }),
-        });
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-        const data = await res.json();
+      const data = await res.json();
 
-        if (!res.ok) {
-          throw new Error(data.error || "Something went wrong");
-        }
-
-        return data;
-      } catch (error) {
-        throw new Error(error.message || "An unexpected error occurred");
+      if (!res.ok) {
+        throw new Error(data.error || "Something went wrong");
       }
+
+      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
@@ -48,75 +44,82 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
-      {/* Left side with background and logo */}
-      <div className="bg-gradient-to-br from-blue-700 to-blue-900 w-full md:w-1/2 flex flex-col justify-center items-center p-8 relative overflow-hidden">
-        {/* Wave pattern overlay */}
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-1/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
-          <div className="absolute top-2/4 left-0 right-0 h-32 bg-blue-400 rounded-full transform scale-x-150 blur-lg"></div>
+    <div className="flex h-screen bg-black">
+      {/* Left side */}
+      <div className="w-1/2 hidden lg:flex flex-col justify-center items-center bg-gradient-to-b from-blue-800 via-blue-700 to-blue-900 relative p-8">
+        <div className="mb-6">
+          <XSvg className="w-16 h-16 fill-white" />
         </div>
-        
-        <div className="relative z-10 max-w-md w-full text-center">
-          {/* Logo */}
-          <div className="mb-6 flex justify-center">
-            <div className="bg-blue-800 border-2 border-blue-400 rounded-full w-16 h-16 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-2xl">B</span>
+        <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
+        <p className="text-white text-center mb-12">
+          Enter your credentials to access your account.
+        </p>
+
+        <div className="w-full max-w-md">
+          {[1, 2, 3].map((step) => (
+            <div
+              key={step}
+              className={`flex items-center p-4 mb-4 rounded-lg transition-all duration-300 cursor-default bg-black bg-opacity-25`}
+            >
+              <div className="w-8 h-8 rounded-full flex items-center justify-center mr-4 bg-black bg-opacity-50 text-white">
+                <span className="font-bold">{step}</span>
+              </div>
+              <span className="font-medium text-gray-300">
+                {step === 1
+                  ? "Login to your account"
+                  : step === 2
+                  ? "Explore the dashboard"
+                  : "Enjoy the platform"}
+              </span>
             </div>
-          </div>
-          
-          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Welcome to Babbly
-          </h1>
-          <p className="text-blue-100 text-lg opacity-90">
-            Connect with friends and share your world
-          </p>
+          ))}
         </div>
       </div>
 
-      {/* Right side with login form */}
-      <div className="w-full md:w-1/2 flex justify-center items-center p-6 bg-gray-900">
-        <div className="max-w-md w-full py-8 px-6 rounded-lg">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-white">Welcome</h2>
-            <p className="mt-2 text-gray-400">Log in to your account to continue</p>
+      {/* Right side */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="lg:hidden flex justify-center mb-6">
+            <XSvg className="w-16 h-16 fill-white" />
           </div>
+          <h2 className="text-2xl font-bold text-white mb-2">Log In</h2>
+          <p className="text-gray-400 mb-6">Access your account securely</p>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Email/Username Field */}
+            {/* Username or Email */}
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-white mb-2 font-medium">
                 Email or Username
               </label>
-              <div className="relative">
+              <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-blue-500 focus-within:border-blue-500 transition-colors">
+                <MdOutlineMail className="text-gray-400 text-xl" />
                 <input
-                  id="username"
-                  name="username"
                   type="text"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your email or username"
-                  onChange={handleInputChange}
+                  name="username"
                   value={formData.username}
+                  onChange={handleInputChange}
+                  placeholder="Enter your email or username"
+                  required
+                  className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
                 />
               </div>
             </div>
 
-            {/* Password Field */}
+            {/* Password */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              <label className="block text-white mb-2 font-medium">
                 Password
               </label>
-              <div className="relative">
+              <div className="rounded-lg flex items-center gap-3 bg-gray-800 p-4 border border-transparent hover:border-blue-500 focus-within:border-blue-500 transition-colors">
+                <MdPassword className="text-gray-400 text-xl" />
                 <input
-                  id="password"
-                  name="password"
                   type="password"
-                  required
-                  className="appearance-none relative block w-full px-3 py-3 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter your password"
-                  onChange={handleInputChange}
+                  name="password"
                   value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter your password"
+                  required
+                  className="grow bg-transparent focus:outline-none text-white placeholder-gray-500"
                 />
               </div>
             </div>
@@ -128,33 +131,24 @@ const LoginPage = () => {
               </div>
             )}
 
-            {/* Sign In Button */}
-            <div className="mt-8">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
-              >
-                {isLoading ? (
-                  <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Loading...
-                  </span>
-                ) : (
-                  "LOG IN"
-                )}
-              </button>
-            </div>
+            {/* Login Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full btn rounded-lg text-white py-4 mt-4 bg-blue-600 hover:bg-blue-700 border-none shadow-lg transition-all"
+            >
+              {isLoading ? "Logging in..." : "LOG IN"}
+            </button>
           </form>
 
           {/* Sign Up Link */}
           <div className="text-center mt-6">
             <p className="text-gray-400">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-400 hover:text-blue-300 font-medium">
+              <Link
+                to="/signup"
+                className="text-blue-400 hover:text-blue-300 font-medium"
+              >
                 Sign Up
               </Link>
             </p>

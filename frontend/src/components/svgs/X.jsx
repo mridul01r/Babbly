@@ -1,34 +1,21 @@
-import React from 'react';
+const XSvg = (props) => (
+	<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
 
-const BabblySvg = (props) => (
-  <svg
-    aria-hidden="true"
-    viewBox="0 0 200 60"
-    xmlns="http://www.w3.org/2000/svg"
-    className={`w-32 h-12 ${props.className || ''}`}
-    {...props}
-  >
-    <defs>
-      {/* Text gradient that works well with dark blue backgrounds */}
-      <linearGradient id="textGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stopColor="#5CFFFA" />
-        <stop offset="100%" stopColor="#38C0FF" />
-      </linearGradient>
-    </defs>
-    
-    {/* Main text with gradient and FF Avance font family */}
-    <text
-      x="100"
-      y="38"
-      fontFamily="'FF Avance', sans-serif"
-      fontSize="36"
-      fontWeight="bold"
-      textAnchor="middle"
-      fill="url(#textGradient)"
-    >
-      BABBLY
+  <g transform="translate(20, 20)">
+    <path d="M0 0 C0 -6 6 -10 12 -10 H40 C46 -10 52 -6 52 0 V10 C52 16 46 20 40 20 H20 L10 30 V20 H12 C6 20 0 16 0 10 V0 Z"
+          fill="white" />
+
+
+    <circle cx="15" cy="5" r="2.5" fill="#0A0A0A" />
+    <circle cx="25" cy="5" r="2.5" fill="#0A0A0A" />
+    <circle cx="35" cy="5" r="2.5" fill="#0A0A0A" />
+
+    <text x="70" y="18" font-family="Segoe UI, sans-serif" font-size="32" font-weight="bold" fill="white">
+      Babbly
     </text>
-  </svg>
-);
+  </g>
+</svg>
 
-export default BabblySvg;
+
+);
+export default XSvg;
